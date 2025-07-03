@@ -22,9 +22,9 @@ yargs(hideBin(process.argv))
                 type: 'string',
             });
         },
-       (argv)=>{
-         addRepo(argv.file);
-       }
+        (argv) => {
+            addRepo(argv.file);
+        }
     )
     .command(
         'commit <message>',
@@ -35,7 +35,9 @@ yargs(hideBin(process.argv))
                 type: 'string',
             });
         },
-        commitRepo
+        (argv) => {
+            commitRepo(argv.message);
+        }
     )
     .command(
         'push',
@@ -52,10 +54,10 @@ yargs(hideBin(process.argv))
     .command(
         'revert <commitID',
         'Revert to a specific commit',
-        (yargs)=>{
-            return yargs.positional('commitID' , {
-                describe:"Commit ID to revert to ",
-                type:"string"
+        (yargs) => {
+            return yargs.positional('commitID', {
+                describe: "Commit ID to revert to ",
+                type: "string"
             })
         },
         revertRepo

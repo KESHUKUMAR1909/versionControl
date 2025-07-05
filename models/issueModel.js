@@ -23,4 +23,4 @@ const IssueSchema = new mongoose.Schema({
 
 });
 const Issue = mongoose.model("Issue" , IssueSchema);
-export default Issue;
+module.exports = Issue;

@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const { required } = require("yargs");
 
 const IssueSchema = new mongoose.Schema({
     title: {
@@ -10,17 +9,17 @@ const IssueSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    status:{
-        type:String,
-        enum:["open" , "closed"],
-        default:"open",
+    status: {
+        type: String,
+        enum: ["open", "closed"],
+        default: "open",
     },
-    repository:{
-        type:Schema.Types.ObjectId,
-        ref:"Repository",
-        required:true,
+    repository: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Repository",
+        required: true,
     },
+}, { timestamps: true });
 
-});
-const Issue = mongoose.model("Issue" , IssueSchema);
+const Issue = mongoose.model("Issue", IssueSchema);
 module.exports = Issue;

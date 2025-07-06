@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { required } = require('yargs');
+
 const RepositorySchema = new mongoose.Schema({
     name: {
         type: String,
@@ -14,21 +14,21 @@ const RepositorySchema = new mongoose.Schema({
             type: String,
         },
     ],
-    visibility:{
-        type:Boolean,  
+    visibility: {
+        type: Boolean,
     },
-    owner:{
-        type:Schema.Types.ObjectId,
-        ref:"User",
-        required:true,
+    owner: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
     },
-    issues:[
+    issues: [
         {
-            type:Schema.Types.ObjectId,
-            ref:"Issue"
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Issue",
         }
     ]
-
 });
-const Repository = mongoose.model("Repository" , RepositorySchema);
+
+const Repository = mongoose.model("Repository", RepositorySchema);
 module.exports = Repository;

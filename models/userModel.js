@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { required } = require('yargs');
+
 const UserSchema = new mongoose.Schema({
     username: {
         type: String,
@@ -16,28 +16,26 @@ const UserSchema = new mongoose.Schema({
     },
     repositories: [
         {
-            default: [],
-            type: Schema.Types.OhjectId,
+            type: mongoose.Schema.Types.ObjectId,
             ref: "Repository",
+            default: []
         }
     ],
     followedUsers: [
         {
-            default: [],
-            type: Schema.Types.OhjectId,
+            type: mongoose.Schema.Types.ObjectId,
             ref: "User",
+            default: []
         }
     ],
-    StartRepos: [
+    StarRepos: [
         {
-            default: [],
-            type: Schema.Types.OhjectId,
+            type: mongoose.Schema.Types.ObjectId,
             ref: "Repository",
+            default: []
         }
     ],
+}, { timestamps: true });
 
-
-});
-
-const User = mongoose.model("User" , UserSchema);
+const User = mongoose.model("User", UserSchema);
 module.exports = User;

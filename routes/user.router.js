@@ -9,7 +9,7 @@ userRouter.get('/allUsers' , userContoller.getAllUsers);
 userRouter.post('/signup' , userContoller.signup);
 userRouter.post('/login' , userContoller.login);
 userRouter.put('/updateProfile' , userContoller.updateUserProfile);
-userRouter.get('/userProfile' , userContoller.getUserProfile);
+userRouter.get('/userProfile/:id' , userContoller.getUserProfile);
 userRouter.delete('/deleteProfile' , userContoller.deleteUserProfile);
 
 module.exports = userRouter;

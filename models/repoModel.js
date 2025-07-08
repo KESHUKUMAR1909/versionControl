@@ -28,6 +28,8 @@ const RepositorySchema = new mongoose.Schema({
             ref: "Issue",
         }
     ]
+}, {
+    timeStamps:true
 });
 
 const Repository = mongoose.model("Repository", RepositorySchema);

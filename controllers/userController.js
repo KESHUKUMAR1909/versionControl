@@ -99,6 +99,7 @@ async function login(req, res) {
         email: user.email,
       },
     });
+    console.log("Completed")
   } catch (err) {
     console.error("Error during login:", err.message);
     res.status(500).send("Server error!");

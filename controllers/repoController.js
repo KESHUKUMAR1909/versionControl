@@ -72,26 +72,29 @@ const fetchRepositoryByName = async (req, res) => {
 };
 
 // GET repositories of logged-in user
+
+
 const fetchRepositoriesForCurrentUser = async (req, res) => {
-    const userId = req.user;
+    const userId = req.params.userID;
+    console.log(userId);
+
+    // Validate ObjectId
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+        return res.status(400).json({ error: "Invalid user ID" });
+    }
 
     try {
         const repositories = await Repository.find({ owner: userId });
 
-        if (!repositories || repositories.length === 0) {
-            return res.status(404).json({ error: "No repositories found for this user" });
-        }
-
-        res.json({
+        res.status(200).json({
             message: "Repositories retrieved successfully",
-            repositories
+            repositories,
         });
     } catch (err) {
         console.error("Error fetching user's repositories:", err);
-        res.status(500).json({ error: "Internal Server Error while fetching user's repositories" });
+        res.status(500).json({ error: "Internal server error" });
     }
 };
-
 // UPDATE a repository
 const updateRepositoryById = async (req, res) => {
     const { id } = req.params;

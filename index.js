@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 const yargs = require('yargs');
 const { hideBin } = require('yargs/helpers');
 const express = require('express');
@@ -8,6 +9,55 @@ const bodyParser = require("body-parser");
 const http = require('http');
 const { Server } = require('socket.io');
 
+// ✅ Move this function above yargs command registration
+async function startServer() {
+  const app = express();
+  const port = process.env.PORT || 3000;
+  const mongoURI = process.env.MONGO_URI;
+
+  if (!mongoURI) {
+    console.error('❌ MONGO_URI not defined in environment variables');
+    process.exit(1);
+  }
+
+  try {
+    console.log("📡 Connecting to MongoDB...");
+    await mongoose.connect(mongoURI);
+    console.log("✅ Connected to MongoDB");
+  } catch (err) {
+    console.error("❌ MongoDB connection failed:", err.message);
+    process.exit(1);
+  }
+
+  app.use(cors({ origin: process.env.CLIENT_ORIGIN || '*' }));
+  app.use(bodyParser.json());
+  app.use(express.json());
+
+  // 🔗 API Routes
+  const mainRouter = require('./routes/main.router.js');
+  app.use("/", mainRouter);
+
+  const httpServer = http.createServer(app);
+  const io = new Server(httpServer, {
+    cors: {
+      origin: process.env.CLIENT_ORIGIN || '*',
+      methods: ["GET", "POST"]
+    }
+  });
+
+  io.on('connection', socket => {
+    console.log("🔌 Socket connected");
+    socket.on('joinRoom', userID => {
+      console.log("👤 User joined room:", userID);
+      socket.join(userID);
+    });
+  });
+
+  httpServer.listen(port, () => {
+    console.log(`🚀 Server running at http://localhost:${port}`);
+  });
+}
+
 // CLI Controllers
 const { initRepo } = require('./controllers/init.js');
 const { addRepo } = require('./controllers/add.js');
@@ -15,9 +65,6 @@ const { commitRepo } = require('./controllers/commit.js');
 const { pushRepo } = require('./controllers/push.js');
 const { pullRepo } = require('./controllers/pull.js');
 const { revertRepo } = require('./controllers/revert.js');
-
-// Routers
-const mainRouter = require('./routes/main.router.js');
 
 // Register CLI commands with yargs
 yargs(hideBin(process.argv))
@@ -90,54 +137,3 @@ yargs(hideBin(process.argv))
   .help()
   .epilog('⚡ KeshuGit CLI by Keshu Kumar')
   .argv;
-
-// ====================================
-// 🚀 Backend Server Initialization
-// ====================================
-async function startServer() {
-  const app = express();
-  const port = process.env.PORT || 3000;
-  const mongoURI = process.env.MONGO_URI;
-
-  if (!mongoURI) {
-    console.error('❌ MONGO_URI not defined in .env');
-    process.exit(1);
-  }
-
-  try {
-    console.log("📡 Connecting to MongoDB...");
-    await mongoose.connect(mongoURI);
-    console.log("✅ Connected to MongoDB");
-  } catch (err) {
-    console.error("❌ MongoDB connection failed:", err.message);
-    process.exit(1);
-  }
-
-  app.use(cors({ origin: process.env.CLIENT_ORIGIN || '*' }));
-  app.use(bodyParser.json());
-  app.use(express.json());
-
-  // 🔗 API Routes
-  app.use("/", mainRouter);
-
-  const httpServer = http.createServer(app);
-  const io = new Server(httpServer, {
-    cors: {
-      origin: process.env.CLIENT_ORIGIN || '*',
-      methods: ["GET", "POST"]
-    }
-  });
-
-  // 💬 Socket.IO Events
-  io.on('connection', socket => {
-    console.log("🔌 Socket connected");
-    socket.on('joinRoom', userID => {
-      console.log("👤 User joined room:", userID);
-      socket.join(userID);
-    });
-  });
-
-  httpServer.listen(port, () => {
-    console.log(`🚀 Server running at http://localhost:${port}`);
-  });
-}

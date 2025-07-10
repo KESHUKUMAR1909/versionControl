@@ -1,14 +1,17 @@
 {
-  "name": "backend",
+  "name": "keshugit",
   "version": "1.0.0",
+  "description": "A Git-like CLI tool with backend repo tracking and commit management",
   "main": "index.js",
-  "scripts": {
-    "start": "node index.js"
+  "bin": {
+    "keshugit": "./index.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
+  "scripts": {
+    "start": "node index.js start"
+  },
+  "keywords": ["git", "cli", "version-control", "commit", "backend"],
+  "author": "Keshu Kumar",
+  "license": "MIT",
   "dependencies": {
     "aws-sdk": "^2.1692.0",
     "axios": "^1.10.0",
@@ -17,12 +20,14 @@
     "cors": "^2.8.5",
     "dotenv": "^17.0.1",
     "express": "^5.1.0",
-    "http-server": "^14.1.1",
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.17.0",
     "mongoose": "^8.16.1",
     "socket.io": "^4.8.1",
     "uuid": "^11.1.0",
     "yargs": "^18.0.0"
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1"
   }
 }

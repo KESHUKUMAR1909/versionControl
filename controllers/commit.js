@@ -1,25 +1,60 @@
 const path = require('path');
 const fs = require('fs').promises;
-const {v4 : uuidv4} = require('uuid');
+const { v4: uuidv4 } = require('uuid');
 
-async function commitRepo(message){
-   const repoPath = path.resolve(process.cwd() , '.keshuGit');
-   const stagedPath = path.join(repoPath , "staging");
+async function commitRepo(message) {
+  const repoPath = path.resolve(process.cwd(), '.keshuGit');
+  const stagedPath = path.join(repoPath, 'staging');
+  const commitsPath = path.join(repoPath, 'commits');
 
-   const commitPath = path.join(repoPath , 'commits');
-   try{ 
+  try {
+    // 1. Generate a unique commit ID
     const commitID = uuidv4();
-    const commitDir = path.join(commitPath , commitID);
-    await fs.mkdir(commitDir , {recursive:true});
-    const files = await fs.readdir(stagedPath);
-    for(const file of files){
-        await fs.copyFile(path.join(stagedPath , file) , path.join(commitDir , file));
-    }
-    await fs.writeFile(path.join(commitDir , 'commit-json') , JSON.stringify({message, date:new Date().toISOString()}));
+    const commitDir = path.join(commitsPath, commitID);
+    await fs.mkdir(commitDir, { recursive: true });
 
-    console.log(`Commit ${commitID} created with  message : ${message}`)
-   }catch(err){
-    console.log("Error comitting files " , err);
-   }
+    // 2. Recursively copy staging files/folders into the commit directory
+    const copyRecursive = async (src, dest) => {
+      await fs.mkdir(dest, { recursive: true });
+      const entries = await fs.readdir(src, { withFileTypes: true });
+
+      for (const entry of entries) {
+        const srcPath = path.join(src, entry.name);
+        const destPath = path.join(dest, entry.name);
+
+        if (entry.isDirectory()) {
+          await copyRecursive(srcPath, destPath);
+        } else {
+          await fs.copyFile(srcPath, destPath);
+        }
+      }
+    };
+
+    await copyRecursive(stagedPath, commitDir);
+
+    // 3. Write commit metadata to config.json
+    const metadata = {
+      message,
+      date: new Date().toISOString(),
+      author: process.env.USER || 'anonymous'
+    };
+
+    await fs.writeFile(
+      path.join(commitDir, 'config.json'),
+      JSON.stringify(metadata, null, 2),
+      'utf-8'
+    );
+
+    // 4. (Optional) Clear staging area after commit
+    await fs.rm(stagedPath, { recursive: true, force: true });
+    await fs.mkdir(stagedPath, { recursive: true });
+
+    console.log(`✅ Commit ${commitID} created with message: "${message}"`);
+    return commitID;
+
+  } catch (err) {
+    console.error("❌ Error committing files:", err.message);
+  }
 }
-module.exports = {commitRepo};
+
+module.exports = { commitRepo };

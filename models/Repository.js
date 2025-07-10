@@ -29,8 +29,9 @@ const RepositorySchema = new mongoose.Schema({
         }
     ]
 }, {
-    timeStamps:true
+    timestamps: true // ✅ correct spelling
 });
+RepositorySchema.index({ name: 1, owner: 1 }, { unique: true });
 
 const Repository = mongoose.model("Repository", RepositorySchema);
 module.exports = Repository;
